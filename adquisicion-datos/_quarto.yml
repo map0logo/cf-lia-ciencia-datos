@@ -1,19 +1,28 @@
 project:
-  type: website
+  type: book
 
-website:
+book:
   title: "adquisicion-datos"
+  author: "Francisco Palm"
+  date: "2024-10-09"
   navbar:
     left:
       - href: index.qmd
         text: Home
       - about.qmd
+    search: true
+  sidebar: 
+    logo: "images/logo_fpalm.png"
+  chapters:
+    - index.qmd
+    - about.qmd
 
 format:
   html:
-    theme: cosmo
+    theme: journal
     css: styles.css
     toc: true
+    lang: es
 
 
 
