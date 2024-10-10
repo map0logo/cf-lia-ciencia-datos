@@ -1,0 +1,168 @@
+# Valores atípicos
+
+> Los valores atípicos (outliers) son observaciones que se desvían significativamente de otras observaciones en un conjunto de datos. Estas discrepancias pueden ser el resultado de errores en la medición, variaciones naturales o factores inusuales.
+
+## Tipos de Valores Atípicos
+
+-   **Univariados**: Valores atípicos en una única variable. Por ejemplo, una temperatura extremadamente alta en un conjunto de datos de temperatura.
+
+-   **Multivariados**: Valores atípicos que dependen de la relación entre dos o más variables. Por ejemplo, un nivel de CO2 inusualmente alto en relación con la temperatura y la humedad.
+
+```{python}
+import pandas as pd
+import numpy as np
+```
+
+```{python}
+df = pd.read_parquet("data/air_quality_uci3.parquet")
+```
+
+## Métodos de Detección
+
+### Método del Rango Intercuartílico (IQR)
+
+El método IQR identifica valores atípicos utilizando los cuartiles del conjunto de datos.
+
+**Cálculo**:
+
+1.  Calcular el primer cuartil ($Q_1$) y el tercer cuartil ($Q_3$).
+
+2.  Calcular el rango intercuartílico ($IQR$) como $IQR=Q_3 − Q_1$
+
+3.  Definir los límites inferior y superior como:
+
+    -   Límite inferior: $Q_1 − 1.5 \times IQR$
+
+    -   Límite superior: $Q_3 + 1.5 \times IQR$
+
+```{python}
+Q1 = df['CO(GT)'].quantile(0.25)
+Q3 = df['CO(GT)'].quantile(0.75)
+IQR = Q3 - Q1
+print(f"IQR = {IQR:.2f}")
+```
+
+```{python}
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+print(f"Lim. Inf. = {lower_bound:.2f}")
+print(f"Lim. Sup. = {upper_bound:.2f}")
+```
+
+Veamos si hay valores atípicos:
+
+```{python}
+outliers_iqr = df[(df['CO(GT)'] < lower_bound) | (df['CO(GT)'] > upper_bound)]
+
+outliers_iqr
+```
+
+### Método de Desviación Estándar
+
+Este método asume que los datos siguen una distribución normal y utiliza la media y la desviación estándar para detectar outliers.
+
+**Cálculo**:
+
+1.  Calcular la media y la desviación estándar de la variable.
+
+    ```{python}
+    mean = df['CO(GT)'].mean()
+    std_dev = df['CO(GT)'].std()
+    ```
+
+2.  Definir los límites como:
+
+    -   Límite inferior: $\text{media} - z \times \text{desviación estándar}$
+
+    -   Límite superior: $\text{media} + z \times \text{desviación estándar}$
+
+    Donde $z$ es un valor crítico (comúnmente 3).
+
+```{python}
+z = 3
+lower_bound_std = mean - z * std_dev
+upper_bound_std = mean + z * std_dev
+
+print(f"Lim. Inf. = {lower_bound_std:.2f}")
+print(f"Lim. Sup. = {upper_bound_std:.2f}")
+```
+
+Identificamos los atípicos:
+
+```{python}
+outliers_std = df[(df['CO(GT)'] < lower_bound_std) | (df['CO(GT)'] > upper_bound_std)]
+
+outliers_std
+```
+
+### Visualización Gráfica
+
+Esto implica detectar mediante gráficos a los valores atípicos, generalmente para tener una idea rápida de la cantidad y el tipo de valores atípicos:
+
+-   **Boxplots**: Muestran la distribución de datos y resaltan valores atípicos.
+
+-   **Diagramas de dispersión (scatter plots)**: Útiles para detectar outliers en conjuntos de datos bidimensionales.
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(x=df['CO(GT)'])
+plt.title('Boxplot de CO(GT)')
+plt.show()
+```
+
+### Tratamiento de Valores Atípicos
+
+Los valores atípicos pueden ser tratados de varias maneras:
+
+#### a. Eliminación
+
+Si los valores atípicos son errores de medición o no son representativos del fenómeno que se está estudiando, pueden eliminarse.
+
+``` python
+    df_cleaned = df[~df.index.isin(outliers_iqr.index)]
+```
+
+#### b. Transformación
+
+Si los valores atípicos son válidos y se desea conservarlos, se pueden transformar (por ejemplo, aplicar transformaciones logarítmicas).
+
+``` python
+    df['CO(GT)'] = df['CO(GT)'].apply(lambda x: np.log(x) if x > 0 else x)
+```
+
+```{python}
+plt.figure(figsize=(10, 6))
+sns.histplot(df['CO(GT)'], bins=30, kde=True)
+plt.title('Histograma de CO(GT)')
+plt.xlabel('Concentración de CO (GT)')
+plt.ylabel('Frecuencia')
+plt.grid(axis='y', alpha=0.75)
+plt.show()
+```
+
+En este caso, el error está en asumir que la distribución es simétrica, una transformación logarítmica ayudara a obtener una mejor distribución de los datos y disminuir el número de atípicos.
+
+```{python}
+df['log(CO(GT))'] = df['CO(GT)'].apply(lambda x: np.log(x) if x > 0 else x)
+```
+
+```{python}
+plt.figure(figsize=(10, 6))
+sns.histplot(df['log(CO(GT))'], bins=30, kde=True)
+plt.title('Histograma de log(CO(GT))')
+plt.xlabel('Concentración de log(CO(GT))')
+plt.ylabel('Frecuencia')
+plt.grid(axis='y', alpha=0.75)
+plt.show()
+```
+
+```{python}
+plt.figure(figsize=(10, 6))
+sns.boxplot(x=df['log(CO(GT))'])
+plt.title('Boxplot de log(CO(GT))')
+plt.show()
+```

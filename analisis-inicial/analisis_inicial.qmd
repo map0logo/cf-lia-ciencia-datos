@@ -1,0 +1,34 @@
+# Análisis Inicial de Datos
+
+> Pasos iniciales de un análisis de datos que no responden a las preguntas originales de la investigación
+
+## Calidad de los datos
+
+- ¿En qué medida el conjunto de datos es completo, válido, consistente, exacto, pertinente, y apropiado para su propósito.
+
+- Aparte de los aspectos de interpretación se verifica la existencia de valores duplicados, valores faltantes, valores atípicos o anomalías en la codificación.
+
+## Calidad de las medidas
+
+- Consiste en verificar si la estructura de los instrumentos de medida se corresponde con la estructura reportada.
+
+- Esto es particularmente importante para análisis experimentales donde se utilizan equipos de alta precisión.
+
+## Caracterización de la muestra
+
+Se extraen características de los datos:
+
+- Utilizando técnicas estadísticas como como medidas de centralidad y dispersión.
+
+- Gráficos como diagramas de dispersión o histogramas de frecuencia que describen la distribución de los datos, ya sea de forma unidimensional o en relación a otras variables.
+
+- Tablas cruzadas que reflejen relaciones entre las variables.
+
+
+## Transformaciones a los datos
+
+- Cambios de formato para que se ajusten a las necesidades de análisis y visualización.
+
+- Operaciones básicas: filtros, consultas, selección de variables, creación de nuevas variables a partir de las actuales, agrupar valores por unas variables y agregar los valores de las restantes.
+
+- Formatos especiales como fechas o geolocalización.

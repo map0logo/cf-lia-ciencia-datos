@@ -1,0 +1,80 @@
+## Limpieza de datos
+
+-   Es la tarea más demandante en ciencia de datos y aprendizaje automático.
+-   Consume la mayor parte del tiempo de un proyecto.
+-   Todos los conjuntos de datos son "sucios" en algún grado, incluso los más cuidadosamente preparados
+-   La calidad de datos y la utilidad no necesariamente están juntas
+    -   Los datos "sucios" pueden ser útiles y los datos pueden ser limpios y ser poco útiles
+
+```{python}
+import pandas as pd
+import numpy as np
+```
+
+```{python}
+df = pd.read_parquet("data/air_quality_uci2.parquet")
+```
+
+Los problemas no son únicamente de limpieza o de contenido, con frecuencia un problema de contenido, conduce a un problema de limpieza o viceversa.Formato de los valores
+
+Podemos ver que algunas columnas que deberían ser numéricas aparecen como `object`, esto se debe a que el separador de la parte decimal usa coma `,` en lugar de punto `.`
+
+Esto lo podríamos haber solucionado desde la lectura inicial, haciendo:
+
+``` python
+        df = pd.read_csv('data/AirQualityUCI.csv', sep=';', decimal=',')
+```
+
+Pero como ya hemos avanzado, y sabemos que debemos realizar esta operación en todas las columnas de tipo `object`.
+
+```{python}
+df.dtypes
+```
+
+```{python}
+object_cols = df.select_dtypes(include='object').columns.tolist()
+object_cols
+```
+
+```{python}
+for col in object_cols:
+    df[col] = df[col].str.replace(',', '.').astype(float)
+df.info()
+```
+
+## Marcar faltantes
+
+Marquemos los valores faltantes:
+
+```{python}
+df = df.replace(-200, np.nan)
+# df.replace(-200, np.nan, inplace=True)
+```
+
+```{python}
+df.info()
+```
+
+Ahora que tenemos los faltantes como `np.nan` pandas los reconoce como faltantes.
+
+## Volvamos a revisar el contenido:
+
+```{python}
+df.describe()
+```
+
+## Manejo de faltantes
+
+-   ¿Tiene sentido descartar los faltantes?
+
+-   ¿Tiene sentido imputar los faltantes?
+
+En este caso, se podría o no descartar los faltantes. La proporción de faltantes es relativamente baja, pero aúin no sabemos cuáles variables serán relevantes para nuestro modelo, y la construcción de modelos, incluso preliminares ya forman parte del análisis exploratorio.
+
+De la misma forma, si encontramos patrones consistentes en los valores, podríamos encontrar un criterio confiable para imputar los faltantes, esto es, sustituirlos por un valor numérico.
+
+Guardemos otra vez para continuar:
+
+```{python}
+df.to_parquet("data/air_quality_uci3.parquet")
+```

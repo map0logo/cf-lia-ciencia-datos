@@ -1,0 +1,82 @@
+# Estructura
+
+Se busca detectar y subssanar problemas estructurales relacionados con el formato:
+
+-   Demasiados campos
+
+-   Campos faltantes
+
+-   Falta de correspondencia entre valores y campos
+
+-   Campos mal definidos
+
+## Conjunto de Datos *Air Quality*
+
+<https://archive.ics.uci.edu/dataset/360/air+quality>
+
+Leamos con cuidado la documentación:
+
+-   Cuenta con $5$ variables y $9358$ observaciones.
+
+-   Los valores faltantes están marcados con $-200$.
+
+## Cargar datos
+
+Importemos pandas en una celda aparte:
+
+```{python}
+import pandas as pd
+import numpy as np
+```
+
+Leemos el conjunto de datos considerando que el separador es `;`.
+
+```{python}
+df = pd.read_csv('data/AirQualityUCI.csv', sep=';')
+```
+
+Usualmente nos interesa verificar la estructura del archivo leído:
+
+```{python}
+df.info()
+```
+
+Y validar visualmente que los valores leídos parecen correctos:
+
+```{python}
+df
+```
+
+## Eliminar filas y columnas sobrantes
+
+Quitamos las columnas sobrantes:
+
+```{python}
+df = df.iloc[:, :-2]
+# df = df.drop(columns=["Unnamed: 15", "Unnamed: 16"])
+df
+```
+
+```{python}
+df.info()
+```
+
+Y las filas sobrantes:
+
+```{python}
+df = df.iloc[:9357, :]
+# df = df.dropna()
+df
+```
+
+> Nota: el método `dropna` por defecto elimina todas las filas que tienen algún nulo, si no hubiésemos eliminado las columnas finales habría sido (un poco) más complicado.
+
+Ahora tenemos los datos que realmente nos interesan, con $9357$ filas y $15$ columnas.
+
+## Guardar como parquet para continuar
+
+Necesitamos un formato que mantenga la información de los tipos de datos, los valores especiales y la estructura, ese formato no es `CSV`.
+
+```{python}
+df.to_parquet("data/air_quality_uci1.parquet")
+```

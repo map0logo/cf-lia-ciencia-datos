@@ -1,0 +1,97 @@
+## Contenido
+
+Pueden haber problemas causados por valores incorrectos:
+
+-   Uso de distintas codificaciones
+
+-   Uso inconsistente de minúsculas y mayúsculas
+
+-   Valores faltantes
+
+-   Valores atípicos
+
+## Un ejemplo
+
+| Estudiante# | Apellido  | Nombre    | Color Favorito | Edad |
+|-------------|-----------|-----------|----------------|------|
+| 1           | García    | Sofía     | violeta        | 12   |
+| 2           | Rodríguez | Mateo     | azul,verde     | 13   |
+| 3           | Fernández | Valentina |                | 11   |
+| 4           | López     | Santiago  | gris           | -1   |
+| 5           | Martínez  | Isabella  | 9              | 102  |
+| 6           | Pérez     | Emma      | azul           | 12   |
+
+Volvamos a nuestro ejemplo base:
+
+```{python}
+import pandas as pd
+import numpy as np
+```
+
+```{python}
+df = pd.read_parquet("data/air_quality_uci1.parquet")
+```
+
+## ¿Qué valores tenemos?
+
+```{python}
+df.info()
+```
+
+```{python}
+df.describe()
+```
+
+## Formato de fechas
+
+Fecha y hora son manejados de una forma mucho más adecuada bajo el formato `datetime`.
+
+Validamos su formato.
+
+```{python}
+df[['Date', 'Time']].head()
+```
+
+Creamos la nueva columna:
+
+> El sitio <https://strftime.org/> tiene un resumen muy conveniente de los códigos de formato de tiempo en Python.
+
+```{python}
+df['timestamp'] = pd.to_datetime(
+    df['Date'] + ' ' + df['Time'],
+    format='%d/%m/%Y %H.%M.%S'
+)
+```
+
+Verificamos el resultado:
+
+```{python}
+df[['timestamp']].head()
+```
+
+## Reordenar columnas
+
+El dataframe se verá mejor con la columna `timestamp` de primera, para lograrlo empecemos por eliminar las columnas `Date` y `Time:`
+
+```{python}
+df = df.drop(columns=["Date", "Time"])
+```
+
+```{python}
+df.info()
+```
+
+Y ahora reordenamos:
+
+```{python}
+df = df[["timestamp"] + df.columns[:-1].to_list()]
+df
+```
+
+Nótese que cuando pasamos un valor entre corchetes al dataframe nos estamos refiriendo a las columnas. Cuando pasamos dos valores separados por comas, el primero se refiere a las filas y el segundo a las columnas.
+
+Volvamos a guardar para continuar:
+
+```{python}
+df.to_parquet("data/air_quality_uci2.parquet")
+```

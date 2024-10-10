@@ -1,0 +1,65 @@
+# Introducción
+
+## ¿Qué es el análisis inicial de datos?
+
+El análisis inicial de datos es la fase en la que se inspeccionan los datos **crudos** para entender su **estructura**, **calidad** y **contenido** antes de realizar un análisis más profundo.
+
+Esta fase incluye la revisión de la forma general del conjunto de datos, la identificación de posibles problemas (valores faltantes, duplicados, valores atípicos, inconsistencias), y la preparación de los datos para su uso en el análisis exploratorio y modelado.
+
+## Importancia de la fase preliminar en el ciclo de análisis de datos
+
+La fase preliminar es crucial porque asegura que los datos estén en condiciones adecuadas para análisis avanzados. Realizar un análisis exploratorio o modelado sin una revisión cuidadosa puede llevar a interpretaciones incorrectas y resultados sesgados.
+
+Algunos beneficios incluyen:
+
+-   Identificación temprana de problemas que pueden afectar los resultados.
+
+-   Reducción de errores en los modelos posteriores.
+
+-   Optimización del rendimiento del análisis exploratorio y modelado.
+
+-   Ahorro de tiempo y recursos.
+
+## Diferencias entre el análisis inicial y el exploratorio
+
+### Análisis Inicial:
+
+-   Se enfoca en la revisión básica de la calidad, estructura y contenido de los datos.
+
+-   Es un proceso más mecánico y tiene como objetivo asegurar que los datos estén listos para análisis más complejos.
+
+### Análisis Exploratorio de Datos (AED):
+
+-   Se centra en la comprensión más profunda de los patrones, relaciones y tendencias en los datos.
+
+-   Involucra visualizaciones, estadísticas descriptivas avanzadas y modelos iniciales para descubrir información oculta en los datos.
+
+## ¿Qué son los datos?
+
+-   Los *Datos* son colecciones de valores discretos o continuos que contienen información describiendo cantidad, calidad, u otras unidades de significado como impacto o importancia.
+
+    -   En general, son secuencias de símbolos que pueden ser interpretados formalmente.
+
+-   La palabra «dato» se origina en «dar», y su primer uso fue el de «información de una computadora transmisible y almacenable».
+
+## ¿Qué se quiere decir con «exploratorio»?
+
+-   Hace referencia a las técnicas de análisis de datos que nos sirven de guía para establecer un primer contacto con los datos.
+
+-   El objetivo es contar con más y mejores elementos para planificar los análisis posteriores, lo cuál implica formular las primeras hipótesis como alinear las transformaciones que requieren las técnicas especializadas.
+
+## ¿Estadística descriptiva glorificada?
+
+Aunque en el análisis exploratorio se utilizan conceptos de estadística descriptiva,
+
+> Es fundamental el conocimiento del **dato como valor codificado en un sistema de cómputo** para entender muchos pasos y técnicas del análisis exploratorio.
+
+## Nomenclatura
+
+-   Característica, campo, medición, columna y variable se usan de manera similar.
+-   Fila, registro, observación y muestra también son casi sinónimos.
+
+Los datos generalmente representan mediciones de atributos de un "objeto" común, normalmente organizados en filas (observaciones) y columnas (características). Vale tener cuidado con:
+
+-   Conceptos generales e implementaciones específicas ("data frame" vs "DataFrame"), un dataframe de pandas no es exactamente igual a uno de pyspark, o polars.
+-   Términos genéricos como "data set" y objetos específicos como "dataset" en HDF5.

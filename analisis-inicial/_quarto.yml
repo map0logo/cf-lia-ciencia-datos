@@ -1,19 +1,34 @@
 project:
-  type: website
+  type: book
 
-website:
-  title: "python-ciencia-datos"
+book:
+  title: "Análisis Inicial de Datos"
+  author: "Francisco Palm"
+  date: "2024-10-09"
   navbar:
     left:
       - href: index.qmd
-        text: Home
+        text: Inicio
       - about.qmd
+    search: true
+  sidebar: 
+    logo: "images/logo_fpalm.png"
+  chapters:
+    - index.qmd
+    - intro.qmd
+    - analisis_inicial.qmd
+    - estructura.qmd
+    - contenido.qmd
+    - limpieza.qmd
+    - atipicos.qmd
+    - about.qmd
 
 format:
   html:
-    theme: cosmo
+    theme: journal
     css: styles.css
     toc: true
+    lang: es
 
 
 
