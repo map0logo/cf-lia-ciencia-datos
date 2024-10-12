@@ -6,7 +6,7 @@ title: "Inicio"
 
 En esta sesión, aprenderás los pasos fundamentales para el análisis inicial de datos, el cual es una fase clave antes de embarcarte en un análisis exploratorio profundo. Nos enfocaremos en entender la estructura, calidad y naturaleza de los datos, identificar problemas potenciales, y realizar las transformaciones necesarias para asegurarnos de que los datos estén en condiciones óptimas para un análisis más avanzado.
 
-## **Objetivos del taller:**
+## Objetivos del taller:
 
 1.  Introducir las técnicas y herramientas más usadas en el análisis preliminar de datos.
 
