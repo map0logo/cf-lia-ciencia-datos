@@ -1,19 +1,32 @@
 project:
-  type: website
+  type: book
 
-website:
-  title: "analisis-inicial"
+book:
+  title: "Análisis Exploratorio de Datos"
+  author: "Francisco Palm"
+  date: "2024-10-11"
   navbar:
     left:
       - href: index.qmd
-        text: Home
+        text: Inicio
       - about.qmd
+    search: true
+  sidebar: 
+    logo: "images/logo_fpalm.png"
+  chapters:
+    - index.qmd
+    - intro.qmd
+    - carga.qmd
+    - descriptivo.qmd
+    - correlaciones.qmd
+    - about.qmd
 
 format:
   html:
-    theme: cosmo
+    theme: journal
     css: styles.css
     toc: true
+    lang: es
 
 
 

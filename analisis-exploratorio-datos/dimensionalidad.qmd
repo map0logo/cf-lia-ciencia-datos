@@ -1,0 +1,220 @@
+# Reducción de Dimensionalidad
+
+## Fundamentos de la reducción de dimensionalidad
+
+La reducción de dimensionalidad es una técnica clave en el análisis de datos cuando trabajamos con un gran número de variables. El objetivo es simplificar el conjunto de datos, manteniendo la mayor cantidad de información posible, pero eliminando redundancias o correlaciones entre variables. 
+
+Al reducir las dimensiones:
+- Mejora la interpretabilidad de los datos, facilitando la visualización en 2D o 3D.
+- Reduce el ruido, eliminando variables que aportan poca o ninguna información útil.
+- Mejora la eficiencia computacional, especialmente en algoritmos que son sensibles a la dimensionalidad.
+
+Una técnica común para la reducción de dimensionalidad es el Análisis de Componentes Principales (PCA).
+
+---
+
+## Análisis de Componentes Principales (PCA)
+
+El Análisis de Componentes Principales (PCA) es una técnica que transforma un conjunto de variables posiblemente correlacionadas en un nuevo conjunto de variables no correlacionadas llamadas "componentes principales". Estos componentes explican la mayor parte de la varianza en los datos, con la primera componente explicando la mayor cantidad de varianza y cada componente sucesiva explicando progresivamente menos.
+
+### Pasos para aplicar PCA:
+
+1. Estandarización de los datos: PCA es sensible a la escala de las variables, por lo que es importante estandarizar los datos para que todas las variables contribuyan de manera equitativa.
+2. Cálculo de la matriz de covarianza: La matriz de covarianza muestra cómo las variables están correlacionadas entre sí.
+3. Cálculo de los componentes principales: Estos son los vectores propios (eigenvectors) de la matriz de covarianza, que representan las direcciones en las que varía más el conjunto de datos.
+4. Reducción de la dimensionalidad: Los datos se proyectan sobre los primeros componentes principales para reducir las dimensiones.
+
+Ejemplo: Aplicar PCA en los datos del Índice de Calidad del Aire
+
+Primero, estandarizamos los datos para asegurarnos de que todas las variables tengan la misma escala.
+
+```python
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+# Seleccionar las columnas numéricas para aplicar PCA
+variables_numericas = df_imeca[
+    [
+        'Noroeste Ozono',
+        'Noroeste PM10',
+        'Centro Ozono',
+        'Centro PM10',
+        'Sureste PM25'
+    ]
+]
+
+scaler = StandardScaler()
+datos_estandarizados = scaler.fit_transform(variables_numericas)
+
+pca = PCA(n_components=2)
+pca_2d = pca.fit_transform(datos_estandarizados)
+
+print(f'Varianza explicada por el primer componente: {pca.explained_variance_ratio_[0]:.2f}')
+print(f'Varianza explicada por el segundo componente: {pca.explained_variance_ratio_[1]:.2f}')
+```
+
+---
+
+## Visualización de datos reducidos (PCA 2D y 3D)
+
+Una de las ventajas de la reducción de dimensionalidad es la capacidad de visualizar conjuntos de datos multidimensionales en gráficos 2D o 3D, lo que permite identificar patrones y agrupaciones.
+
+### Visualización 2D de los datos reducidos con PCA
+
+Una vez que hemos reducido los datos a dos componentes principales, podemos visualizarlos en un gráfico de dispersión para analizar la estructura interna de los datos.
+
+```python
+import matplotlib.pyplot as plt
+
+# Visualización 2D de los datos proyectados en los dos primeros componentes principales
+plt.figure(figsize=(8, 6))
+plt.scatter(pca_2d[:, 0], pca_2d[:, 1], c='blue', alpha=0.6, edgecolor='k')
+plt.title('Visualización 2D usando PCA (2 Componentes Principales)', fontsize=16)
+plt.xlabel('Primer Componente Principal')
+plt.ylabel('Segundo Componente Principal')
+plt.grid(True)
+plt.show()
+```
+
+Este gráfico muestra los datos en función de los dos primeros componentes principales, que son las direcciones de mayor variabilidad. Si existen patrones, como agrupaciones o estructuras lineales, se podrán observar más fácilmente en esta visualización.
+
+### Visualización 3D de los datos reducidos con PCA
+
+Si reducimos a tres componentes principales, podemos crear una visualización en 3D para ver cómo se distribuyen los datos en el espacio tridimensional.
+
+```python
+from mpl_toolkits.mplot3d import Axes3D
+
+# Aplicar PCA para reducir a 3 componentes principales
+pca_3d = PCA(n_components=3)
+datos_3d = pca_3d.fit_transform(datos_estandarizados)
+
+# Visualización 3D de los datos proyectados en los tres primeros componentes principales
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+ax.scatter(datos_3d[:, 0], datos_3d[:, 1], datos_3d[:, 2], c='green', alpha=0.6, edgecolor='k')
+ax.set_title('Visualización 3D usando PCA (3 Componentes Principales)', fontsize=16)
+ax.set_xlabel('Primer Componente Principal')
+ax.set_ylabel('Segundo Componente Principal')
+ax.set_zlabel('Tercer Componente Principal')
+plt.show()
+```
+
+Este gráfico en 3D permite explorar los datos en más dimensiones, lo cual puede ayudar a identificar patrones que no se perciben en una visualización bidimensional.
+
+Aquí tienes la inclusión de las técnicas t-SNE y LDA dentro del módulo de reducción de dimensionalidad, con ejemplos de código utilizando el conjunto de datos `df_imeca`.
+
+
+## t-SNE (t-distributed Stochastic Neighbor Embedding)
+
+El t-SNE es una técnica no lineal para la reducción de dimensionalidad que es especialmente útil para la visualización de datos en un espacio de baja dimensión (generalmente 2D o 3D). A diferencia del PCA, que conserva la estructura lineal de los datos, t-SNE se centra en conservar las relaciones locales entre puntos, lo que lo hace muy útil para visualizar datos complejos.
+
+### Pasos para aplicar t-SNE:
+
+1. Seleccionar las características numéricas que queremos analizar.
+2. Estandarizar los datos, ya que t-SNE también es sensible a la escala.
+3. Aplicar t-SNE para reducir a 2 o 3 dimensiones.
+
+Ejemplo de código con t-SNE:
+
+```python
+from sklearn.manifold import TSNE
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+variables_numericas = df_imeca[
+    [
+        'Noroeste Ozono',
+        'Noroeste PM10',
+        'Centro Ozono',
+        'Centro PM10',
+        'Sureste PM25'
+    ]
+]
+
+scaler = StandardScaler()
+datos_estandarizados = scaler.fit_transform(variables_numericas)
+
+tsne = TSNE(n_components=2, perplexity=30, n_iter=1000, random_state=42)
+tsne_result = tsne.fit_transform(datos_estandarizados)
+
+plt.figure(figsize=(8, 6))
+plt.scatter(tsne_result[:, 0], tsne_result[:, 1], c='blue', alpha=0.6, edgecolor='k')
+plt.title('Visualización 2D usando t-SNE', fontsize=16)
+plt.xlabel('Dimensión 1')
+plt.ylabel('Dimensión 2')
+plt.grid(True)
+plt.show()
+```
+
+### Interpretación del gráfico:
+
+- Los puntos cercanos en el gráfico representan observaciones que están cercanas en el espacio de características original.
+- t-SNE es muy bueno para visualizar clusters o agrupaciones naturales en los datos, pero menos adecuado para capturar relaciones globales.
+
+---
+
+## LDA (Linear Discriminant Analysis)
+
+LDA es una técnica supervisada de reducción de dimensionalidad que maximiza la separación entre diferentes clases en el conjunto de datos. Funciona bien cuando tenemos una variable categórica que queremos usar para distinguir diferentes clases y reduce las dimensiones mientras maximiza la separación entre ellas.
+
+### Pasos para aplicar LDA:
+
+1. Asegurarse de tener una variable categórica en el conjunto de datos que pueda utilizarse como objetivo.
+2. Seleccionar las características numéricas para la reducción.
+3. Aplicar LDA para reducir las dimensiones.
+
+Ejemplo de código con LDA:
+
+Supongamos que añadimos una columna de región para el análisis supervisado:
+
+```python
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+import numpy as np
+
+df_imeca['region'] = np.random.choice(
+    ['Noroeste', 'Noreste', 'Centro', 'Suroeste', 'Sureste'],
+    size=len(df_imeca)
+)
+
+# Selección de características numéricas
+variables_numericas = df_imeca[
+    ['Noroeste Ozono', 'Noroeste PM10', 'Centro Ozono', 'Centro PM10', 'Sureste PM25']
+]
+
+
+lda = LDA(n_components=2)
+lda_result = lda.fit_transform(variables_numericas, df_imeca['region'])
+
+plt.figure(figsize=(8, 6))
+plt.scatter(
+    lda_result[:, 0],
+    lda_result[:, 1],
+    c=pd.Categorical(df_imeca['region']).codes,
+    cmap='viridis',
+    alpha=0.6,
+    edgecolor='k'
+)
+plt.title('Visualización 2D usando LDA', fontsize=16)
+plt.xlabel('Componente 1')
+plt.ylabel('Componente 2')
+plt.colorbar(label='Región')
+plt.grid(True)
+plt.show()
+```
+
+##### Interpretación del gráfico:
+
+- En este gráfico, los puntos representan diferentes observaciones, y los colores representan las diferentes clases (regiones).
+- LDA busca maximizar la separación entre las clases, por lo que los puntos de diferentes clases (regiones) deberían estar separados en el espacio reducido.
+
+---
+
+### Revisión:
+
+- PCA se enfoca en capturar la varianza global en los datos y funciona bien para datos lineales.
+- t-SNE es ideal para visualizar relaciones locales en datos complejos, a menudo revelando patrones como clusters ocultos.
+- LDA es una técnica supervisada que maximiza la separación entre clases, útil cuando se dispone de una variable categórica.
+
+Cada técnica tiene sus ventajas y es aplicable en distintos escenarios de reducción de dimensionalidad y visualización de datos. ¡Este módulo te ofrece una visión integral de cómo explorar la estructura interna de tus datos!

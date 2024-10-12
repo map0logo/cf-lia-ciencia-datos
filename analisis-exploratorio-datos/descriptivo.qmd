@@ -1,0 +1,79 @@
+# Análisis Descriptivo
+
+```{python}
+import pandas as pd
+import numpy as np
+```
+
+```{python}
+# Estadísticas descriptivas básicas para todas las columnas numéricas
+df_imeca = pd.read_parquet("data/imeca1996_2022.parquet")
+```
+
+## Estadísticas descriptivas básicas (media, mediana, desviación estándar)
+
+En este primer paso, calcularemos estadísticas descriptivas básicas para entender la tendencia central y la dispersión de las variables.
+
+```{python}
+# Estadísticas descriptivas básicas para todas las columnas numéricas
+df_imeca.describe()
+```
+
+El método `.describe()` proporciona un resumen de:
+- Media: Promedio de los valores.
+- Mediana: Valor central de la distribución.
+- Desviación estándar: Mide la dispersión de los datos alrededor de la media.
+
+Si deseas calcular estas medidas para columnas específicas, por ejemplo, los contaminantes de una región, puedes hacer lo siguiente:
+
+```{python}
+df_imeca[['Noroeste Ozono', 'Noroeste dióxido de azufre', 'Noroeste PM10']].describe()
+```
+
+---
+
+## Distribución de los datos: Histogramas y distribuciones de frecuencia
+
+Para visualizar la distribución de los datos, podemos utilizar histogramas, los cuales nos ayudan a ver cómo están distribuidos los valores de los contaminantes.
+
+Histogramas de los contaminantes:
+
+```{python}
+import matplotlib.pyplot as plt
+
+df_imeca[['Noroeste Ozono', 'Noroeste dióxido de azufre', 'Noroeste PM10']].hist(bins=30, figsize=(12, 8))
+plt.suptitle('Distribución de contaminantes en la región Noroeste', fontsize=16)
+plt.show()
+```
+
+Esto generará histogramas de los contaminantes específicos de la región Noroeste, permitiendo observar si las distribuciones son normales, sesgadas, o si presentan otros patrones.
+
+Distribución de frecuencias:
+
+Si deseas calcular la frecuencia de valores en intervalos, puedes usar `value_counts` o `cut` para dividir los datos en categorías:
+
+```{python}
+df_imeca['Noroeste Ozono'].value_counts(bins=10)
+```
+
+---
+
+## Resumen de variables categóricas: Tablas de frecuencia
+
+Aunque el conjunto de datos no incluye variables categóricas clásicas (ya que todas las variables son numéricas), podemos crear categorías de las concentraciones de contaminantes para resumirlas en tablas de frecuencia.
+
+Por ejemplo, podríamos categorizar el nivel de ozono en la región Noroeste en rangos que indiquen niveles de calidad del aire (bueno, moderado, malo, etc.).
+
+```{python}
+df_imeca['Ozono_Categoria'] = pd.cut(
+    df_imeca['Noroeste Ozono'],
+    bins=[0, 50, 100, 150, np.inf],
+    labels=['Bueno', 'Moderado', 'Malo', 'Muy Malo']
+)
+
+tabla_frecuencia = df_imeca['Ozono_Categoria'].value_counts()
+tabla_frecuencia
+```
+
+Este código divide los valores de ozono en categorías basadas en rangos predefinidos y luego crea una tabla de frecuencia que muestra cuántas veces cada categoría aparece.
+

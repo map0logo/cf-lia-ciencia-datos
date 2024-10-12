@@ -1,7 +1,14 @@
----
-title: "python-ciencia-datos"
----
+# Presentación
 
-This is a Quarto website.
+En esta sesión los participantes verán cómo realizar un análisis exploratorio de datos (AED) utilizando Python. Se trabajará con datos reales del Índice de Calidad del Aire de Ciudad de México, abordando desde la carga y preparación de los datos hasta la visualización y el análisis de correlaciones.
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+## Objetivos
+
+- Cargar y preparar datos para análisis.
+- Realizar un análisis descriptivo y visualizar los datos.
+- Aplicar modelos simples para formular hipótesis.
+- Utilizar gráficos y visualizaciones para obtener insights de los datos.
+
+## Herramientas
+
+Utilizaremos Python y bibliotecas como Pandas, Matplotlib, Seaborn y Scikit-learn, en entornos como Jupyter Notebook o Google Colab para facilitar la práctica y experimentación con los datos.

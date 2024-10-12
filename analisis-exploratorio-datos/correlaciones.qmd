@@ -1,0 +1,248 @@
+
+# Análisis de Correlaciones y Relación entre Variables
+
+```{python}
+import pandas as pd
+import numpy as np
+```
+
+```{python}
+# Estadísticas descriptivas básicas para todas las columnas numéricas
+df_imeca = pd.read_parquet("data/imeca1996_2022.parquet")
+```
+
+## Matrices de correlación
+
+Una matriz de correlación muestra el grado de correlación entre cada par de variables numéricas en un conjunto de datos. Es una herramienta visual importante para identificar relaciones lineales fuertes (positivas o negativas) entre variables.
+
+Ejemplo: Generar una matriz de correlación para los contaminantes en las diferentes regiones:
+
+```{python}
+# Calcular la matriz de correlación para las variables numéricas en el dataframe
+correlacion = df_imeca[
+    ["Noroeste Ozono", "Noroeste PM10", "Centro Ozono", "Centro PM10", "Sureste PM25"]
+].corr()
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 6))
+sns.heatmap(correlacion, annot=True, cmap="coolwarm", linewidths=0.5)
+plt.title(
+    "Matriz de Correlación entre Contaminantes en Diferentes Regiones", fontsize=16
+)
+plt.show()
+```
+
+Interpretación de la matriz de correlación:
+- Valores cercanos a 1 indican una fuerte correlación positiva (cuando una variable sube, la otra también).
+- Valores cercanos a -1 indican una fuerte correlación negativa (cuando una variable sube, la otra baja).
+- Valores cercanos a 0 indican que no hay correlación entre las variables.
+
+---
+
+## Coeficientes de correlación de Pearson y Spearman
+
+El coeficiente de correlación de Pearson mide la relación lineal entre dos variables continuas. Asume que la relación entre las variables es lineal y que los datos son normalmente distribuidos.
+
+El coeficiente de correlación de Spearman es una medida no paramétrica de la correlación. No requiere que los datos sigan una distribución normal y es útil para detectar relaciones monótonas, sean lineales o no.
+
+### Correlación de Pearson
+
+Para calcular la correlación de Pearson entre dos variables, puedes usar la función `corr()` de Pandas con el método `pearson`.
+
+```{python}
+pearson_corr = df_imeca["Noroeste Ozono"].corr(
+    df_imeca["Noroeste PM10"], method="pearson"
+)
+print(f"Correlación de Pearson entre Noroeste Ozono y Noroeste PM10: {pearson_corr}")
+```
+
+### Correlación de Spearman
+
+La correlación de Spearman es útil cuando no podemos asumir que la relación es lineal o los datos no siguen una distribución normal.
+
+```{python}
+spearman_corr = df_imeca["Noroeste Ozono"].corr(
+    df_imeca["Noroeste PM10"], method="spearman"
+)
+print(f"Correlación de Spearman entre Noroeste Ozono y Noroeste PM10: {spearman_corr}")
+```
+
+Comparación entre Pearson y Spearman:
+- Usa Pearson cuando sospechas que la relación entre las variables es lineal.
+- Usa Spearman cuando la relación es monótona pero no necesariamente lineal, o cuando los datos no son normales (es decir, no siguen una distribución normal).
+
+---
+
+## Relación entre variables continuas y categóricas
+
+En este conjunto de datos, aunque todas las variables son numéricas, podemos crear variables categóricas a partir de variables continuas. Esto es útil para entender cómo las categorías se relacionan con las variables continuas.
+
+### Creación de variables categóricas a partir de continuas
+
+Podemos categorizar los niveles de ozono en la región Noroeste en diferentes rangos, que representen distintos niveles de calidad del aire, y analizar cómo estas categorías se relacionan con otras variables.
+
+```{python}
+
+df_imeca['Niveles_Ozono'] = pd.cut(
+    df_imeca['Noroeste Ozono'], 
+    bins=[0, 50, 100, 150, np.inf], 
+    labels=['Bajo', 'Moderado', 'Alto', 'Muy Alto']
+)
+
+# Mostrar la distribución de la nueva variable categórica
+print(df_imeca['Niveles_Ozono'].value_counts())
+```
+
+### Análisis de la relación entre variables continuas y categóricas con gráficos
+
+Un boxplot es una forma útil de visualizar cómo se distribuyen las variables continuas en función de las categorías.
+
+Comparación de las concentraciones de PM10 según los niveles de ozono categorizados:
+
+```{python}
+plt.figure(figsize=(8, 6))
+sns.boxplot(x="Niveles_Ozono", y="Noroeste PM10", data=df_imeca)
+plt.title(
+    "Concentración de PM10 según los Niveles de Ozono en la Región Noroeste",
+    fontsize=16,
+)
+plt.xlabel("Niveles de Ozono")
+plt.ylabel("Concentración de PM10")
+plt.show()
+```
+
+### Análisis de tablas de contingencia
+
+Las tablas de contingencia permiten resumir la relación entre variables categóricas. Por ejemplo, podemos analizar cuántas veces cada nivel de ozono se asocia con una cierta categoría de PM10.
+
+```{python}
+# Crear categorías para los niveles de PM10 en la región Noroeste
+df_imeca["Niveles_PM10"] = pd.cut(
+    df_imeca["Noroeste PM10"],
+    bins=[0, 50, 100, 150, 200],
+    labels=["Bajo", "Moderado", "Alto", "Muy Alto"],
+)
+
+tabla_contingencia = pd.crosstab(df_imeca["Niveles_Ozono"], df_imeca["Niveles_PM10"])
+print(tabla_contingencia)
+```
+
+## Análisis temporal
+
+Para determinar si la contaminación del aire ha disminuido con el tiempo utilizando el conjunto de datos `df_imeca`, podrías realizar un análisis temporal observando las tendencias de las concentraciones de los contaminantes a lo largo del tiempo. Aquí te propongo un enfoque paso a paso para llevar a cabo este análisis:
+
+### Agrupar los datos por periodos de tiempo (meses o años)
+
+Para analizar la tendencia a lo largo del tiempo, puedes agrupar los datos por meses o años y calcular la media de los contaminantes en esos periodos.
+
+Por ejemplo, agrupar por meses:
+
+```{python}
+# Agrupar por mes y calcular la media de los contaminantes
+df_imeca_mes = (
+    df_imeca.select_dtypes(include=["datetime", float])
+    .resample("ME", on="Fecha-Hora")
+    .mean()
+)
+
+# Mostrar las primeras filas del DataFrame agrupado por mes
+df_imeca_mes.head()
+```
+
+### Graficar la evolución temporal de los contaminantes
+
+Ahora, para visualizar si la contaminación ha disminuido, puedes crear un gráfico de línea que muestre la evolución temporal de los diferentes contaminantes.
+
+Por ejemplo, visualizar la tendencia del **Ozono** en la región Noroeste:
+
+```{python}
+import matplotlib.pyplot as plt
+
+# Graficar la evolución del Ozono en la región Noroeste a lo largo del tiempo
+plt.figure(figsize=(10, 6))
+plt.plot(
+    df_imeca_mes.index,
+    df_imeca_mes["Noroeste Ozono"],
+    label="Noroeste Ozono",
+    color="blue",
+)
+plt.title(
+    "Tendencia del Ozono en la Región Noroeste a lo largo del Tiempo", fontsize=16
+)
+plt.xlabel("Fecha")
+plt.ylabel("Concentración de Ozono")
+plt.grid(True)
+plt.legend()
+plt.show()
+```
+
+### Análisis de la tendencia (métodos cuantitativos)
+
+Para analizar si existe una tendencia significativa de disminución de la contaminación, puedes aplicar un ajuste de línea de tendencia o calcular la **pendiente** mediante una regresión lineal simple.
+
+#### Ajuste de línea de tendencia
+
+```{python}
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+df_imeca_mes = df_imeca_mes.dropna(subset=["Noroeste Ozono"])
+
+X = np.arange(len(df_imeca_mes)).reshape(-1, 1)  # Tiempo en forma de índice
+y = df_imeca_mes["Noroeste Ozono"].values.reshape(-1, 1)  # Ozono en la región Noroeste
+
+modelo = LinearRegression()
+modelo.fit(X, y)
+
+predicciones = modelo.predict(X)
+
+plt.figure(figsize=(10, 6))
+plt.plot(
+    df_imeca_mes.index,
+    df_imeca_mes["Noroeste Ozono"],
+    label="Noroeste Ozono",
+    color="blue",
+)
+plt.plot(
+    df_imeca_mes.index,
+    predicciones,
+    label="Tendencia Lineal",
+    color="red",
+    linestyle="--",
+)
+plt.title("Tendencia del Ozono con Ajuste Lineal en la Región Noroeste", fontsize=16)
+plt.xlabel("Fecha")
+plt.ylabel("Concentración de Ozono")
+plt.grid(True)
+plt.legend()
+plt.show()
+
+print(f"Pendiente de la tendencia: {modelo.coef_[0][0]:.4f}")
+```
+
+- Si la **pendiente** es negativa, esto indicaría una disminución en la concentración del contaminante con el tiempo.
+- Si la pendiente es cercana a cero o positiva, esto indicaría que no ha habido una disminución significativa.
+
+#### Comparar periodos antes y después
+
+Si estás interesado en comparar periodos específicos (por ejemplo, años antes y después de una intervención), puedes agrupar los datos por años y calcular el promedio de los contaminantes en esos periodos:
+
+```{python}
+df_imeca_anual = (
+    df_imeca.select_dtypes(include=["datetime", float])
+    .resample("YE", on="Fecha-Hora")
+    .mean()
+)
+
+plt.figure(figsize=(10, 6))
+plt.bar(df_imeca_anual.index.year, df_imeca_anual["Noroeste Ozono"], color="skyblue")
+plt.title("Concentración Anual Promedio de Ozono en la Región Noroeste", fontsize=16)
+plt.xlabel("Año")
+plt.ylabel("Concentración de Ozono")
+plt.show()
+```
+
+Este gráfico te permitirá comparar fácilmente la evolución del contaminante a lo largo de los años.
+

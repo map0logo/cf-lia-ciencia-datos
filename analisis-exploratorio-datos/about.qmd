@@ -1,5 +1,15 @@
 ---
-title: "About"
+title: "Acerca de"
 ---
 
-About this site
+Mi nombre es **Francisco Palm**, entusiasta del código y la ciencia abierta. En redes sociales me puedes encontrar como **\@mapologo** en Twitter (ahora X) y **fpalm** en LinkedIn. Tengo una larga trayectoria en la enseñanza y desarrollo de soluciones de datos y análisis geoespacial, combinando la informática con modelos matemáticos.
+
+## Filosofía del Taller
+
+La ciencia de datos es una disciplina que combina rigor técnico con creatividad. Este taller busca no solo enseñar las habilidades técnicas necesarias, sino también fomentar una mentalidad crítica y analítica que ayude a los participantes a abordar sus propios problemas de análisis de datos de manera efectiva.
+
+## Licencia del Contenido
+
+Todo el contenido de este taller está disponible bajo la licencia **Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)**. Esto significa que puedes compartir y adaptar el material libremente, siempre y cuando atribuyas el trabajo original y lo distribuyas bajo la misma licencia.
+
+Análisis inicial de datos © 2024 by Francisco Palm is licensed under [CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)

@@ -1,0 +1,264 @@
+# Carga y Preparación de los Datos
+
+## Revisión de la calidad de los datos (valores faltantes, duplicados)
+
+### Carga del Conjunto de Datos
+
+Empezamos por cargar el conjunto de datos:
+
+```{python}
+from urllib.request import urlretrieve
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+```
+
+```python
+for year in tqdm(range(1996, 2023)):
+    url = f"http://www.aire.cdmx.gob.mx/descargas/basesimeca/imeca{year}.xls"
+    filename = f"data/{Path(url).name}"
+    urlretrieve(url, filename)
+```
+
+```{python}
+dfs = []
+for year in tqdm(range(1996, 2023)):
+    df = pd.read_excel(f"data/imeca{year}.xls")
+    dfs.append(df)
+```
+
+### Revisión inicial de los datos
+
+Una vez cargado el dataset, se deben revisar sus dimensiones y columnas para tener una idea de la estructura de los datos.
+
+Veamos un ejemplo de los datos cargados:
+
+```{python}
+dfs[5]
+```
+
+```{python}
+df_imeca = pd.concat(dfs, ignore_index=True)
+df_imeca
+```
+
+```{python}
+df_imeca.info()
+```
+
+Como podemos ver en las [especificaciones del conjunto de datos](http://www.aire.cdmx.gob.mx/estadisticas-consultas/descargas/INDICExls-csv.pdf) hay algunos datos que no aparecen en todo el conjunto, y algunas columnas cuyos nombres cambian en el tiempo ("Noreste ozono" en lugar de "Noreste Ozono").
+
+El tiempo está separado en fecha y hora, y los valores nulos, que no lo dicen en la especificaciones, están marcados con $-99$.
+
+Hay algunas hojas de cálculo con el nombre de la columna `Fecha` todo en mayúsculas (`FECHA`).
+
+```{python}
+df_imeca[~pd.isna(df_imeca.FECHA)].FECHA
+```
+
+El problema con los nombres lo podemos resolver con el método `combine_first`.
+
+```{python}
+df_imeca.Fecha = df_imeca.Fecha.combine_first(df_imeca.FECHA)
+```
+
+```{python}
+zonas = ["Noroeste", "Noreste", "Centro", "Suroeste", "Sureste"]
+for zona in zonas:
+    df_imeca[f"{zona} Ozono"] = df_imeca[f"{zona} Ozono"].combine_first(
+        df_imeca[f"{zona} ozono"]
+    )
+```
+
+Borramos las columnas sobrantes
+
+```{python}
+df_imeca = df_imeca.drop(columns=["FECHA"] + [f"{zona} ozono" for zona in zonas])
+```
+
+Unimos las columnas Fecha y Hora:
+
+```{python}
+df_imeca.Hora = pd.to_timedelta(df_imeca.Hora, unit='h')
+df_imeca.Hora
+```
+
+```{python}
+df_imeca.Fecha
+```
+
+```{python}
+df_imeca["Fecha-Hora"] = df_imeca.Fecha + df_imeca.Hora
+```
+
+```{python}
+df_imeca = df_imeca.drop(columns=["Fecha", "Hora"])
+df_imeca
+```
+
+### Detección de valores faltantes:
+
+Marcamos los valores nulos
+
+```{python}
+df_imeca = df_imeca.replace(-99, np.nan)
+```
+
+Y podemos visualizarlos:
+
+```{python}
+import seaborn as sns
+import matplotlib.pyplot as plt
+```
+
+```{python}
+plt.figure(figsize=(12, 8))
+sns.heatmap(df_imeca.isnull(), cmap="viridis", cbar=False, yticklabels=False)
+
+plt.title("Mapa de Calor de Valores Faltantes", fontsize=16)
+plt.show()
+```
+
+Es crucial identificar qué columnas tienen valores faltantes para decidir cómo manejarlos (eliminación, imputación, etc.).
+
+```{python}
+df_imeca.isnull().sum()
+```
+
+-   ¿Qué hacemos con los faltantes?
+
+    -   En principio nada hasta que no tengamos claro que vamos a hacer con nuestros datos, y siempre conservar una copia de los datos originales.
+
+Detección de duplicados:
+
+También es importante revisar si existen filas duplicadas que puedan distorsionar el análisis.
+
+```python
+df_imeca.duplicated().sum()
+```
+
+------------------------------------------------------------------------
+
+### Transformaciones iniciales (normalización, codificación, eliminación de outliers)
+
+Normalización de datos:
+
+La normalización es útil cuando se trabaja con variables en diferentes escalas. En el caso del Índice de Calidad del Aire, es posible que los valores de algunos contaminantes tengan diferentes rangos de magnitud. Normalizarlos ayudará a asegurar que no predominen en el análisis posterior.
+
+```{python}
+from sklearn.preprocessing import MinMaxScaler
+```
+
+```{python}
+contaminantes = [
+    'Noroeste Ozono',
+    'Noroeste dióxido de azufre',
+    'Noroeste dióxido de nitrógeno',
+    'Noroeste monóxido de carbono',
+    'Noroeste PM10'
+]
+scaler = MinMaxScaler()
+scaler.fit_transform(df_imeca[contaminantes])
+```
+
+Comparemos
+
+```{python}
+df_imeca[contaminantes]
+```
+
+### Codificación de variables categóricas:
+
+Si el conjunto de datos incluye variables categóricas (por ejemplo, nombres de estaciones o días de la semana), necesitarás convertirlas en variables numéricas. Una técnica común es la codificación one-hot.
+
+```python
+# Convertir las variables categóricas a variables dummy (one-hot encoding)
+df_imeca = pd.get_dummies(df_imeca, columns=['Estacion', 'Dia'])
+```
+
+### Eliminación de outliers:
+
+Los outliers pueden distorsionar la interpretación de los datos. Para detectar outliers en los contaminantes, se puede utilizar el método del rango intercuartílico (IQR) o el Z-score.
+
+```python
+# Método IQR para eliminar outliers
+Q1 = df_imeca['PM10'].quantile(0.25)
+Q3 = df_imeca['PM10'].quantile(0.75)
+IQR = Q3 - Q1
+
+# Definir los límites de detección de outliers
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+# Filtrar outliers
+df_imeca = df_imeca[(df_imeca['PM10'] >= lower_bound) & (df_imeca['PM10'] <= upper_bound)]
+```
+
+------------------------------------------------------------------------
+
+### Manipulación básica de datos con Pandas
+
+Una vez que los datos han sido revisados y transformados, es fundamental enseñar a los participantes cómo manipularlos usando `Pandas` para que puedan explorar y procesar los datos.
+
+Selección de columnas y filtrado de datos:
+
+Los participantes aprenderán a seleccionar subconjuntos de datos o filtrar filas específicas. Esto es útil, por ejemplo, si quieren analizar la calidad del aire en una estación o un contaminante en particular.
+
+```python
+# Seleccionar columnas específicas (por ejemplo, variables de la zona Sureste)
+subset = df_imeca[[col for col in df_imeca.columns if col.contains("Sureste")]]
+
+# Filtrar los datos por una fecha específica
+filtered_data = df_imeca[df_imeca['Fecha-hora'].year == 1996]
+```
+
+### Agrupación y agregación de datos:
+
+El análisis de datos suele involucrar la agrupación y agregación para obtener insights más detallados. En este caso, podrías agrupar por estación o por días de la semana para obtener estadísticas resumidas.
+
+```python
+# Agrupar por mes y año
+df_imeca.groupby(df_imeca['Fecha-Hora'].dt.to_period('M')).mean()
+```
+
+O agrupamos por mes (independientemente del año).
+
+```{python}
+df_imeca.groupby(df_imeca['Fecha-Hora'].dt.month).mean()
+```
+
+### Ordenamiento de datos:
+
+El orden de los datos puede ser importante para ciertos análisis o visualizaciones.
+
+```python
+# Ordenar los datos por el nivel de PM10 de mayor a menor
+df_imeca.sort_values(by='Sureste Ozono', ascending=False)
+```
+
+### Aplicación de funciones personalizadas:
+
+En algunos casos, puede ser necesario aplicar funciones personalizadas a los datos. Aquí los participantes aprenderán a usar `apply` para realizar operaciones más complejas.
+
+```python
+# Aplicar una función que clasifique la calidad del aire en 'Buena', 'Mala', 'Peligrosa'
+def clasificar_calidad(pm10):
+    if pm10 < 50:
+        return 'Buena'
+    elif 50 <= pm10 < 100:
+        return 'Mala'
+    else:
+        return 'Peligrosa'
+
+df_imeca['Sureste PM10'].apply(clasificar_calidad)
+```
+
+## Guardamos los resultados
+
+Como no iba a ser de otra manera, en formato parquet
+
+```{python}
+df_imeca.to_parquet("data/imeca1996_2022.parquet")
+```

@@ -1,0 +1,92 @@
+# Introducción al Análisis Exploratorio de Datos (AED)
+
+## ¿Qué es el AED y por qué es importante?
+
+Proceso crítico que se realiza antes de aplicar modelos estadísticos o de machine learning. El AED tiene como objetivo explorar los datos sin hacer suposiciones iniciales para descubrir patrones, anomalías, relaciones y características esenciales. Es el punto de partida que permite conocer la estructura y naturaleza de los datos para tomar decisiones informadas sobre cómo procesarlos.
+
+## Importancia:
+
+-   **Identificación de patrones ocultos:** El AED permite descubrir tendencias y patrones que no son evidentes a simple vista.
+-   **Detección de outliers o anomalías:** Es crucial detectar valores que no siguen el comportamiento general, como niveles atípicos de contaminación en algunas estaciones de monitoreo de la Ciudad de México.
+-   **Mejora la toma de decisiones:** Al conocer mejor los datos, podemos decidir qué variables son relevantes y cómo tratarlas (limpieza, transformación, etc.).
+-   **Hipótesis iniciales:** A través del AED, se generan hipótesis sobre el comportamiento de los datos que pueden ser probadas más adelante en análisis confirmatorios o modelado.
+
+## Ejemplo con los datos de Calidad del Aire de CDMX
+
+El conjunto de datos "Air Quality" era interesante para el análisis inicial, pero para el caso del análisis exploratorio no era tan interesante porque su objetivo era ayudar a calibrar los sensores más que medir la propia calidad del aire.
+
+Por esta razón, seleccioné un conjunto de datos similar: [Índice de la calidad del aire de CDMX](https://datos.cdmx.gob.mx/dataset/indice-de-calidad-del-aire)
+
+Al principio fue un desafío porque la mayoría de los enlaces de descarga no funcionan, a través de Kaggle encontré [esta página](http://www.aire.cdmx.gob.mx/default.php?opc=%27aqBjnmY=%27) desde donde se pueden descargar en formato Excel.
+
+## Un AED empieza por plantearse preguntas
+
+-   ¿Cuáles son las zonas de la ciudad con peores índices de calidad del aire?
+-   ¿Cómo varía la calidad del aire a lo largo del año o en diferentes días de la semana, mes u año?
+-   ¿Existen patrones de correlación entre estaciones cercanas?
+
+------------------------------------------------------------------------
+
+## Diferencias entre el Análisis Exploratorio y el Análisis Confirmatorio
+
+**Análisis Exploratorio de Datos (AED):**
+
+-   **Objetivo:** Explorar, entender y descubrir la estructura de los datos.
+
+-   **Hipótesis:** Se generan hipótesis pero no se prueban de manera formal.
+
+-   **Métodos:** Utiliza gráficos, resúmenes estadísticos y métodos visuales para comprender los datos.
+
+-   **Proceso:** Es un enfoque no estructurado, donde se busca entender los datos sin imponer ningún modelo o suposición inicial.
+
+**Análisis Confirmatorio de Datos (ACD):**
+
+-   **Objetivo:** Probar hipótesis o validar modelos específicos utilizando métodos estadísticos formales.
+
+-   **Hipótesis:** Parte de una hipótesis formulada previamente que se somete a prueba.
+
+-   **Métodos:** Estadística inferencial, pruebas de hipótesis, regresión y otros modelos para confirmar patrones observados.
+
+-   **Proceso:** Tiene un enfoque más estructurado y dirigido por modelos que prueban una suposición basada en el AED.
+
+**Ejemplo práctico con datos de Calidad del Aire de CDMX:**
+
+-   **AED**: Exploras los niveles de contaminantes a lo largo del tiempo para ver si hay fluctuaciones diarias o estacionales.
+
+-   **ACD**: Después de la exploración, podrías probar una hipótesis como: "La calidad del aire es significativamente peor durante los meses de invierno debido a la mayor acumulación de partículas en el aire".
+
+------------------------------------------------------------------------
+
+## Fases del AED en el proceso de Ciencia de Datos
+
+### **Fase 1: Carga y revisión de los datos**
+
+-   Se importa el conjunto de datos y se revisan las dimensiones, tipos de variables y la presencia de valores faltantes o duplicados.
+-   **Ejemplo:** Cargar los datos del Índice de Calidad del Aire de la CDMX y revisar qué columnas están presentes (estaciones de monitoreo, contaminantes, fechas, valores de calidad del aire, etc.).
+
+### **Fase 2: Limpieza y transformación de los datos**
+
+-   En esta fase, se maneja la limpieza de datos (eliminación de outliers, imputación de valores faltantes, normalización).
+-   **Ejemplo:** Si alguna estación tiene datos faltantes en ciertas fechas, puedes decidir si eliminar esas filas o imputar esos valores basándote en el comportamiento de estaciones cercanas.
+
+### **Fase 3: Análisis descriptivo**
+
+-   Se generan resúmenes estadísticos y gráficos básicos para obtener una visión general de los datos.
+-   **Ejemplo:** Calcular la media, mediana, y la desviación estándar de los niveles de contaminantes en diferentes zonas.
+
+### **Fase 4: Visualización de datos**
+
+-   Aquí es donde se emplean gráficos para visualizar relaciones, distribuciones y tendencias.
+-   **Ejemplo:** Crear gráficos de líneas para observar cómo varían los niveles de contaminación a lo largo del tiempo en diferentes estaciones.
+
+### **Fase 5: Detección de patrones y relaciones**
+
+-   Se busca detectar correlaciones o patrones entre variables.
+-   **Ejemplo:** Analizar si existe una correlación entre los niveles de ozono y otros contaminantes en ciertas áreas.
+
+### **Fase 6: Interpretación y generación de hipótesis**
+
+-   Finalmente, se generan hipótesis basadas en los patrones encontrados durante la exploración.
+-   **Ejemplo:** "Los niveles de contaminación tienden a ser más altos durante las horas pico de tráfico y en días de alta radiación solar".
+
+------------------------------------------------------------------------
